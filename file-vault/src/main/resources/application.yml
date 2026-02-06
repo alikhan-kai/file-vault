@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: file-vault
+
+  # --- РЕАКТИВНАЯ БАЗА ДАННЫХ (R2DBC) ---
+  # Используется основным приложением для асинхронной работы с метаданными
+  r2dbc:
+    url: r2dbc:postgresql://127.0.0.1:5433/filevault_db
+    username: user
+    password: password
+    pool:
+      max-idle-time: 30s # Очищаем неиспользуемые соединения через 30 сек
+
+  # Отключаем стандартную инициализацию SQL, так как используем Flyway
+  sql:
+    init:
+      mode: never
+
+  # --- МИГРАЦИИ БАЗЫ ДАННЫХ (Flyway) ---
+  # Flyway не умеет работать через R2DBC, поэтому здесь используем обычный JDBC.
+  # Это нужно только при старте для создания таблиц.
+  flyway:
+    enabled: true
+    url: jdbc:postgresql://127.0.0.1:5433/filevault_db
+    user: user
+    password: password
+
+# --- ОБЪЕКТНОЕ ХРАНИЛИЩЕ (MinIO) ---
+minio:
+  endpoint: http://127.0.0.1:9000
+  accessKey: minioadmin
+  secretKey: minioadmin
+  bucket: uploads # Имя "корзины", где будут лежать наши файлы
